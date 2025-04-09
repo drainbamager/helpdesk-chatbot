@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from llama_index.core import ServiceContext, VectorStoreIndex
+from llama_index.core import VectorStoreIndex, Settings
 from llama_index.llms.openai import OpenAI
 from llama_index.readers.web.simple_web.base import SimpleWebPageReader
 from llama_index.core.schema import Document
@@ -13,7 +13,7 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 # Set up LLM
 llm = OpenAI(model="gpt-4")
-service_context = ServiceContext.from_defaults(llm=llm)
+Settings.llm = llm
 
 # === Load Documents ===
 def fetch_helpjuice_articles():
@@ -42,7 +42,7 @@ def load_index():
     helpjuice_docs = fetch_helpjuice_articles()
     event_docs = scrape_event_site()
     all_docs = helpjuice_docs + event_docs
-    index = VectorStoreIndex.from_documents(all_docs, service_context=service_context)
+    index = VectorStoreIndex.from_documents(all_docs)
     return index
 
 # === Streamlit UI ===
