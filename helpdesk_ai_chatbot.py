@@ -2,8 +2,8 @@ import os
 import streamlit as st
 from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
 from llama_index.llms import OpenAI
-from llama_index.readers import SimpleWebPageReader  # Updated import path for SimpleWebPageReader
-from llama_index import Document  # Adjusted import path for Document
+from llama_index.readers.web import SimpleWebPageReader
+from llama_index.readers.schema.base import Document
 from bs4 import BeautifulSoup
 import requests
 
