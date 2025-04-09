@@ -32,7 +32,14 @@ def scrape_event_site():
     for url in urls:
         res = requests.get(url)
         soup = BeautifulSoup(res.text, 'html.parser')
-        text = soup.get_text()
+
+        # Remove unnecessary tags like header, footer, nav, scripts
+        for tag in soup(['script', 'style', 'header', 'footer', 'nav']):
+            tag.decompose()
+
+        # Extract visible text and clean whitespace
+        text = ' '.join(soup.stripped_strings)
+
         documents.append(Document(text=text, metadata={"source": url}))
     return documents
 
