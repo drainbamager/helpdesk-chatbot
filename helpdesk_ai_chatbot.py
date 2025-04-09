@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from llama_index.core import ServiceContext, VectorStoreIndex
 from llama_index.llms.openai import OpenAI
-from llama_index.readers.web import SimpleWebPageReader
+from llama_index.readers.web.simple_web.base import SimpleWebPageReader
 from llama_index.core.schema import Document
 from bs4 import BeautifulSoup
 import requests
