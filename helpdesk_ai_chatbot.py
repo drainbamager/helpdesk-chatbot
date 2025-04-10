@@ -40,7 +40,7 @@ def scrape_event_site():
         # Extract visible text and clean whitespace
         text = ' '.join(soup.stripped_strings)
 
-        documents.append(Document(text=text, metadata={"source": url}))
+        documents.append(Document(text=text, metadata={"source": url, "doc_id": url}))
     return documents
 
 @st.cache_resource(show_spinner=True)
@@ -67,7 +67,8 @@ if query:
     st.markdown("---")
     st.markdown("### 📚 Sources:")
     for node in response.source_nodes:
-        st.markdown(f"- {node.node.metadata.get('source', 'Unknown')}")
+        source = node.node.metadata.get('source') or node.node.metadata.get('doc_id') or 'Unknown'
+        st.markdown(f"- {source}")
 
 st.markdown("---")
 st.markdown("Built with 🧠 using LlamaIndex + OpenAI + Streamlit")
