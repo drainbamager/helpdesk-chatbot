@@ -6,13 +6,17 @@ from llama_index.readers.web.simple_web.base import SimpleWebPageReader
 from llama_index.core.schema import Document
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 # === Configuration ===
 # Load your OpenAI key securely (don't hardcode in production)
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 # Set up LLM
-llm = OpenAI(model="gpt-4")
+llm = OpenAI(model="gpt-4o")
 Settings.llm = llm
 
 # === Load Documents ===
@@ -29,18 +33,26 @@ def scrape_event_site():
         "https://the.ismaili/globalencounters/"
     ]
     documents = []
-    for url in urls:
-        res = requests.get(url)
-        soup = BeautifulSoup(res.text, 'html.parser')
 
-        # Remove unnecessary tags like header, footer, nav, scripts
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+
+    for url in urls:
+        driver.get(url)
+        time.sleep(3)  # wait for JavaScript to render
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+
         for tag in soup(['script', 'style', 'header', 'footer', 'nav']):
             tag.decompose()
 
-        # Extract visible text and clean whitespace
         text = ' '.join(soup.stripped_strings)
-
         documents.append(Document(text=text, metadata={"source": url, "doc_id": url}))
+
+    driver.quit()
     return documents
 
 @st.cache_resource(show_spinner=True)
